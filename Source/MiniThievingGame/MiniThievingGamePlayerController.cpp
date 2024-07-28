@@ -22,12 +22,6 @@ AMiniThievingGamePlayerController::AMiniThievingGamePlayerController()
 	FollowTime = 0.f;
 }
 
-void AMiniThievingGamePlayerController::BeginPlay()
-{
-	// Call the base class  
-	Super::BeginPlay();
-}
-
 void AMiniThievingGamePlayerController::SetupInputComponent()
 {
 	// set up gameplay key bindings

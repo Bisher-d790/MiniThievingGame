@@ -14,6 +14,8 @@ class AMiniThievingGameCharacter : public ACharacter
 public:
 	AMiniThievingGameCharacter();
 
+#pragma region Camera
+public:
 	/** Returns TopDownCameraComponent subobject **/
 	FORCEINLINE class UCameraComponent* GetTopDownCameraComponent() const { return TopDownCameraComponent; }
 	/** Returns CameraBoom subobject **/
@@ -34,5 +36,6 @@ private:
 	/** The rotation degree to rotate the camera boom */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	FRotator CameraRotation = FRotator(0.f, 0.f, 90.f);
+#pragma endregion Camera
 };
 

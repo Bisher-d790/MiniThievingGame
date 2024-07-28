@@ -24,6 +24,8 @@ class AMiniThievingGamePlayerController : public APlayerController
 public:
 	AMiniThievingGamePlayerController();
 
+#pragma region Input
+public:
 	/** Time Threshold to know if it was a short press */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
 	float ShortPressThreshold;
@@ -58,9 +60,6 @@ protected:
 
 	virtual void SetupInputComponent() override;
 
-	// To add mapping context
-	virtual void BeginPlay();
-
 	/** Input handlers for SetDestination action. */
 	void OnInputStarted();
 	void OnSetDestinationTriggered();
@@ -78,6 +77,13 @@ private:
 
 	bool bIsTouch; // Is it a touch device
 	float FollowTime; // For how long it has been pressed
+#pragma endregion Input
+
+#pragma region UI
+private:
+	UPROPERTY(EditDefaultsOnly, Category = UI)
+	TSubclassOf<UUserWidget> StartScreenWidget = nullptr;
+#pragma endregion UI
 };
 
 
