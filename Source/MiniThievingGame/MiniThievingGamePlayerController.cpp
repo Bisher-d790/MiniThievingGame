@@ -53,6 +53,9 @@ void AMiniThievingGamePlayerController::SetupInputComponent()
 		EnhancedInputComponent->BindAction(SetDestinationTouchAction, ETriggerEvent::Triggered, this, &AMiniThievingGamePlayerController::OnTouchTriggered);
 		EnhancedInputComponent->BindAction(SetDestinationTouchAction, ETriggerEvent::Completed, this, &AMiniThievingGamePlayerController::OnTouchReleased);
 		EnhancedInputComponent->BindAction(SetDestinationTouchAction, ETriggerEvent::Canceled, this, &AMiniThievingGamePlayerController::OnTouchReleased);
+
+		// Input Actions
+		EnhancedInputComponent->BindAction(CrouchInputAction, ETriggerEvent::Triggered, this, &AMiniThievingGamePlayerController::OnCrouchTriggered);
 	}
 	else
 	{
@@ -70,7 +73,7 @@ void AMiniThievingGamePlayerController::OnSetDestinationTriggered()
 {
 	// We flag that the input is being pressed
 	FollowTime += GetWorld()->GetDeltaSeconds();
-	
+
 	// We look for the location in the world where the player has pressed the input
 	FHitResult Hit;
 	bool bHitSuccessful = false;
@@ -88,7 +91,7 @@ void AMiniThievingGamePlayerController::OnSetDestinationTriggered()
 	{
 		CachedDestination = Hit.Location;
 	}
-	
+
 	// Move towards mouse pointer or touch
 	APawn* ControlledPawn = GetPawn();
 	if (ControlledPawn != nullptr)
@@ -122,4 +125,15 @@ void AMiniThievingGamePlayerController::OnTouchReleased()
 {
 	bIsTouch = false;
 	OnSetDestinationReleased();
+}
+
+void AMiniThievingGamePlayerController::OnCrouchTriggered()
+{
+	if (const auto character = GetCharacter())
+	{
+		if (!character->bIsCrouched)
+			character->Crouch();
+		else
+			character->UnCrouch();
+	}
 }
