@@ -45,7 +45,11 @@ AMiniThievingGameCharacter::AMiniThievingGameCharacter()
 	PrimaryActorTick.bStartWithTickEnabled = true;
 }
 
-void AMiniThievingGameCharacter::Tick(float DeltaSeconds)
+void AMiniThievingGameCharacter::RotateCameraBoom(const float RotateValue)
 {
-    Super::Tick(DeltaSeconds);
+	if (FMath::IsNearlyZero(RotateValue) || !IsValid(CameraBoom))
+		return;
+
+	const auto CameraRotationAddition = (RotateValue > 0.f) ? CameraRotation : (-1 * CameraRotation);
+	CameraBoom->SetRelativeRotation(CameraBoom->GetRelativeRotation() + CameraRotationAddition);
 }

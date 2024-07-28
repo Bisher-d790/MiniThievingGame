@@ -56,6 +56,7 @@ void AMiniThievingGamePlayerController::SetupInputComponent()
 
 		// Input Actions
 		EnhancedInputComponent->BindAction(CrouchInputAction, ETriggerEvent::Triggered, this, &AMiniThievingGamePlayerController::OnCrouchTriggered);
+		EnhancedInputComponent->BindAction(CameraRotationInputAction, ETriggerEvent::Started, this, &AMiniThievingGamePlayerController::OnRotateCameraInput);
 	}
 	else
 	{
@@ -129,11 +130,21 @@ void AMiniThievingGamePlayerController::OnTouchReleased()
 
 void AMiniThievingGamePlayerController::OnCrouchTriggered()
 {
-	if (const auto character = GetCharacter())
+	if (const auto OwnedCharacter = GetCharacter())
 	{
-		if (!character->bIsCrouched)
-			character->Crouch();
+		if (!OwnedCharacter->bIsCrouched)
+			OwnedCharacter->Crouch();
 		else
-			character->UnCrouch();
+			OwnedCharacter->UnCrouch();
+	}
+}
+
+void AMiniThievingGamePlayerController::OnRotateCameraInput(const FInputActionInstance& Instance)
+{
+	const float FloatValue = Instance.GetValue().Get<float>();
+
+	if (const auto ThiefCharacter = Cast<AMiniThievingGameCharacter>(GetCharacter()))
+	{
+		ThiefCharacter->RotateCameraBoom(FloatValue);
 	}
 }
