@@ -1,6 +1,6 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
-
 #include "MiniThievingGameCharacter.h"
+
+// Engine
 #include "UObject/ConstructorHelpers.h"
 #include "Camera/CameraComponent.h"
 #include "Components/DecalComponent.h"
@@ -10,6 +10,8 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Materials/Material.h"
 #include "Engine/World.h"
+
+// Project
 
 AMiniThievingGameCharacter::AMiniThievingGameCharacter()
 {

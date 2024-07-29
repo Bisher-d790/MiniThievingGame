@@ -1,26 +1,50 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
-
 #include "MiniThievingGameGameMode.h"
+
+// Engine
+#include "UObject/ConstructorHelpers.h"
+#include "Kismet/GameplayStatics.h"
+
+// Project
 #include "MiniThievingGamePlayerController.h"
 #include "MiniThievingGameCharacter.h"
-#include "UObject/ConstructorHelpers.h"
 
-AMiniThievingGameGameMode::AMiniThievingGameGameMode()
+void AMiniThievingGameGameMode::StartPlay()
 {
-	// use our custom PlayerController class
-	PlayerControllerClass = AMiniThievingGamePlayerController::StaticClass();
+	Super::StartPlay();
 
-	// set default pawn class to our Blueprinted character
-	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/TopDown/Blueprints/BP_TopDownCharacter"));
-	if (PlayerPawnBPClass.Class != nullptr)
+	ChangeGamePhase(EGamePhase::Waiting);
+}
+
+void AMiniThievingGameGameMode::ChangeGamePhase(EGamePhase NewGamePhase)
+{
+	CurrentGamePhase = NewGamePhase;
+
+	switch (NewGamePhase)
 	{
-		DefaultPawnClass = PlayerPawnBPClass.Class;
+	case EGamePhase::Waiting:
+		StartWaitingPhase();
+		break;
+
+	case EGamePhase::InProgress:
+		StartInProgressPhase();
+		break;
+
+	case EGamePhase::Finished:
+		StartFinishedPhase();
+		break;
 	}
+}
 
-	// set default controller to our Blueprinted controller
-	static ConstructorHelpers::FClassFinder<APlayerController> PlayerControllerBPClass(TEXT("/Game/TopDown/Blueprints/BP_TopDownPlayerController"));
-	if(PlayerControllerBPClass.Class != NULL)
+void AMiniThievingGameGameMode::StartInProgressPhase()
+{
+	const auto World = GetWorld();
+	if (!IsValid(World)) return;
+
+	const auto PlayerControllerNum = UGameplayStatics::GetNumPlayerControllers(World);
+	for (int PCIndex = 0; PCIndex < PlayerControllerNum; PCIndex++)
 	{
-		PlayerControllerClass = PlayerControllerBPClass.Class;
+		if (const auto PC = UGameplayStatics::GetPlayerController(World, PCIndex))
+			if (const auto MTGPC = Cast<AMiniThievingGamePlayerController>(PC))
+				MTGPC->SetPlayerWaiting(false);
 	}
 }

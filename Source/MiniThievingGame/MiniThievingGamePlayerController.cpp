@@ -1,16 +1,21 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
-
 #include "MiniThievingGamePlayerController.h"
+
+// Engine
 #include "GameFramework/Pawn.h"
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
-#include "MiniThievingGameCharacter.h"
 #include "Engine/World.h"
 #include "EnhancedInputComponent.h"
 #include "InputActionValue.h"
 #include "EnhancedInputSubsystems.h"
 #include "Engine/LocalPlayer.h"
+#include "Blueprint/UserWidget.h"
+#include "Kismet/GameplayStatics.h"
+
+// Project
+#include "MiniThievingGameCharacter.h"
+#include "MiniThievingGameGameMode.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -20,6 +25,42 @@ AMiniThievingGamePlayerController::AMiniThievingGamePlayerController()
 	DefaultMouseCursor = EMouseCursor::Default;
 	CachedDestination = FVector::ZeroVector;
 	FollowTime = 0.f;
+}
+
+void AMiniThievingGamePlayerController::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (const auto MTGGameMode = Cast<AMiniThievingGameGameMode>(UGameplayStatics::GetGameMode(GetWorld())))
+	{
+		SetPlayerWaiting(MTGGameMode->GetCurrentGamePhase() == EGamePhase::Waiting);
+	}
+}
+
+void AMiniThievingGamePlayerController::SetPlayerWaiting(const bool bIsWaiting)
+{
+	if (bIsWaiting)
+	{
+		ShowStartScreen();
+		SetMovementInputEnabled(false);
+		bIsWaitingForInput = true;
+	}
+	else
+	{
+		HideStartScreen();
+		SetMovementInputEnabled(true);
+	}
+}
+
+void AMiniThievingGamePlayerController::OnAnyKeyPressed()
+{
+	if (bIsWaitingForInput)
+	{
+		bIsWaitingForInput = false;
+
+		if (const auto MTGGameMode = Cast<AMiniThievingGameGameMode>(UGameplayStatics::GetGameMode(GetWorld())))
+			MTGGameMode->ChangeGamePhase(EGamePhase::InProgress);
+	}
 }
 
 void AMiniThievingGamePlayerController::SetupInputComponent()
@@ -66,6 +107,8 @@ void AMiniThievingGamePlayerController::OnInputStarted()
 // Triggered every frame when the input is held down
 void AMiniThievingGamePlayerController::OnSetDestinationTriggered()
 {
+	if (!bIsMovementInputEnabled) return;
+
 	// We flag that the input is being pressed
 	FollowTime += GetWorld()->GetDeltaSeconds();
 
@@ -98,6 +141,8 @@ void AMiniThievingGamePlayerController::OnSetDestinationTriggered()
 
 void AMiniThievingGamePlayerController::OnSetDestinationReleased()
 {
+	if (!bIsMovementInputEnabled) return;
+
 	// If it was a short press
 	if (FollowTime <= ShortPressThreshold)
 	{
@@ -112,18 +157,24 @@ void AMiniThievingGamePlayerController::OnSetDestinationReleased()
 // Triggered every frame when the input is held down
 void AMiniThievingGamePlayerController::OnTouchTriggered()
 {
+	if (!bIsMovementInputEnabled) return;
+
 	bIsTouch = true;
 	OnSetDestinationTriggered();
 }
 
 void AMiniThievingGamePlayerController::OnTouchReleased()
 {
+	if (!bIsMovementInputEnabled) return;
+
 	bIsTouch = false;
 	OnSetDestinationReleased();
 }
 
 void AMiniThievingGamePlayerController::OnCrouchTriggered()
 {
+	if (!bIsMovementInputEnabled) return;
+
 	if (const auto OwnedCharacter = GetCharacter())
 	{
 		if (!OwnedCharacter->bIsCrouched)
@@ -135,10 +186,32 @@ void AMiniThievingGamePlayerController::OnCrouchTriggered()
 
 void AMiniThievingGamePlayerController::OnRotateCameraInput(const FInputActionInstance& Instance)
 {
+	if (!bIsMovementInputEnabled) return;
+
 	const float FloatValue = Instance.GetValue().Get<float>();
 
 	if (const auto ThiefCharacter = Cast<AMiniThievingGameCharacter>(GetCharacter()))
 	{
 		ThiefCharacter->RotateCameraBoom(FloatValue);
+	}
+}
+
+void AMiniThievingGamePlayerController::ShowStartScreen()
+{
+	if (!StartScreenWidget) return;
+
+	if (!IsValid(StartScreenInstance))
+		StartScreenInstance = CreateWidget<UUserWidget>(GetWorld(), StartScreenWidget);
+
+	if (IsValid(StartScreenInstance))
+		StartScreenInstance->AddToViewport(0);
+}
+
+void AMiniThievingGamePlayerController::HideStartScreen()
+{
+	if (IsValid(StartScreenInstance))
+	{
+		StartScreenInstance->RemoveFromParent();
+		StartScreenInstance->Destruct();
 	}
 }

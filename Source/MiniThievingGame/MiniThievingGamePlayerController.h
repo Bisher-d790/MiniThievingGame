@@ -1,5 +1,3 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -21,11 +19,26 @@ class AMiniThievingGamePlayerController : public APlayerController
 {
 	GENERATED_BODY()
 
+#pragma region Override
 public:
 	AMiniThievingGamePlayerController();
 
+	virtual void BeginPlay() override;
+#pragma endregion Override
+
+#pragma region Functionalities
+public:
+	virtual void SetPlayerWaiting(const bool bIsWaiting);
+#pragma endregion Functionalities
+
 #pragma region Input
 public:
+	UFUNCTION(BlueprintCallable, Category = Input)
+	void SetMovementInputEnabled(const bool bIsEnabled) { bIsMovementInputEnabled = bIsEnabled; }
+
+	UFUNCTION(BlueprintCallable, Category = Input)
+	void OnAnyKeyPressed();
+
 	/** Time Threshold to know if it was a short press */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
 	float ShortPressThreshold;
@@ -77,12 +90,22 @@ private:
 
 	bool bIsTouch; // Is it a touch device
 	float FollowTime; // For how long it has been pressed
+
+	bool bIsMovementInputEnabled = true;
+
+	bool bIsWaitingForInput = false;
 #pragma endregion Input
 
 #pragma region UI
+public:
+	void ShowStartScreen();
+
+	void HideStartScreen();
+
 private:
 	UPROPERTY(EditDefaultsOnly, Category = UI)
 	TSubclassOf<UUserWidget> StartScreenWidget = nullptr;
+	UPROPERTY() UUserWidget* StartScreenInstance = nullptr;
 #pragma endregion UI
 };
 
