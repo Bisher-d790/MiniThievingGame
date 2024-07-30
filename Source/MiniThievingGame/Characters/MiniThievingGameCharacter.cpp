@@ -12,6 +12,7 @@
 #include "Engine/World.h"
 
 // Project
+#include "MiniThievingGame/Objective/PickableActor.h"
 
 AMiniThievingGameCharacter::AMiniThievingGameCharacter()
 {
@@ -54,4 +55,15 @@ void AMiniThievingGameCharacter::RotateCameraBoom(const float RotateValue)
 
 	const auto CameraRotationAddition = (RotateValue > 0.f) ? CameraRotation : (-1 * CameraRotation);
 	CameraBoom->SetRelativeRotation(CameraBoom->GetRelativeRotation() + CameraRotationAddition);
+}
+
+void AMiniThievingGameCharacter::PickUpActor(APickableActor* Actor)
+{
+	if (IsValid(PickedUpActor))
+		PickedUpActor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+
+	if (IsValid(Actor))
+		Actor->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale, PickUpSocket);
+
+	PickedUpActor = Actor;
 }

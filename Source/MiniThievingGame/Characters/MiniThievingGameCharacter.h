@@ -5,6 +5,8 @@
 
 #include "MiniThievingGameCharacter.generated.h"
 
+class APickableActor;
+
 UCLASS(Blueprintable)
 class AMiniThievingGameCharacter : public ACharacter
 {
@@ -36,5 +38,20 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	FRotator CameraRotation = FRotator(0.f, 0.f, 90.f);
 #pragma endregion Camera
+
+#pragma region PickUp
+public:
+	void PickUpActor(APickableActor* Actor);
+
+	UFUNCTION(BlueprintPure, Category = "PickUp")
+	FORCEINLINE APickableActor* GetPickedUpActor() const { return PickedUpActor; }
+
+private:
+	UPROPERTY(EditDefaultsOnly, Category = "PickUp")
+	FName PickUpSocket = "HoldingSocket";
+
+	UPROPERTY()
+	APickableActor* PickedUpActor = nullptr;
+#pragma endregion PickUp
 };
 
