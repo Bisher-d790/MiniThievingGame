@@ -29,12 +29,14 @@ public:
 #pragma region Functionalities
 public:
 	virtual void SetPlayerWaiting(const bool bIsWaiting);
+
+	virtual void PlayerGameOver(const bool bHasWon);
 #pragma endregion Functionalities
 
 #pragma region Input
 public:
 	UFUNCTION(BlueprintCallable, Category = Input)
-	void SetMovementInputEnabled(const bool bIsEnabled) { bIsMovementInputEnabled = bIsEnabled; }
+	FORCEINLINE void SetMovementInputEnabled(const bool bIsEnabled) { bIsMovementInputEnabled = bIsEnabled; }
 
 	UFUNCTION(BlueprintCallable, Category = Input)
 	void OnAnyKeyPressed();
@@ -102,10 +104,16 @@ public:
 
 	void HideStartScreen();
 
+	void ShowGameOverScreen(const bool bHasWon);
+
 private:
 	UPROPERTY(EditDefaultsOnly, Category = UI)
 	TSubclassOf<UUserWidget> StartScreenWidget = nullptr;
 	UPROPERTY() UUserWidget* StartScreenInstance = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, Category = UI)
+	TSubclassOf<UUserWidget> GameOverWidget = nullptr;
+	UPROPERTY() UUserWidget* GameOverInstance = nullptr;
 #pragma endregion UI
 };
 

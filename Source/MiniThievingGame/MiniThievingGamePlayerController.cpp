@@ -31,9 +31,13 @@ void AMiniThievingGamePlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (const auto MTGGameMode = Cast<AMiniThievingGameGameMode>(UGameplayStatics::GetGameMode(GetWorld())))
+	const auto World = GetWorld();
+	if (!IsValid(World)) return;
+
+	if (const auto GM = UGameplayStatics::GetGameMode(World))
 	{
-		SetPlayerWaiting(MTGGameMode->GetCurrentGamePhase() == EGamePhase::Waiting);
+		if (const auto MTGGameMode = Cast<AMiniThievingGameGameMode>(GM))
+			SetPlayerWaiting(MTGGameMode->GetCurrentGamePhase() == EGamePhase::Waiting);
 	}
 }
 
@@ -52,14 +56,27 @@ void AMiniThievingGamePlayerController::SetPlayerWaiting(const bool bIsWaiting)
 	}
 }
 
+void AMiniThievingGamePlayerController::PlayerGameOver(const bool bHasWon)
+{
+	ShowGameOverScreen(bHasWon);
+
+	SetMovementInputEnabled(false);
+}
+
 void AMiniThievingGamePlayerController::OnAnyKeyPressed()
 {
 	if (bIsWaitingForInput)
 	{
+		const auto World = GetWorld();
+		if (!IsValid(World)) return;
+
 		bIsWaitingForInput = false;
 
-		if (const auto MTGGameMode = Cast<AMiniThievingGameGameMode>(UGameplayStatics::GetGameMode(GetWorld())))
-			MTGGameMode->ChangeGamePhase(EGamePhase::InProgress);
+		if (const auto GM = UGameplayStatics::GetGameMode(World))
+		{
+			if (const auto MTGGameMode = Cast<AMiniThievingGameGameMode>(GM))
+				MTGGameMode->ChangeGamePhase(EGamePhase::InProgress);
+		}
 	}
 }
 
@@ -198,10 +215,11 @@ void AMiniThievingGamePlayerController::OnRotateCameraInput(const FInputActionIn
 
 void AMiniThievingGamePlayerController::ShowStartScreen()
 {
-	if (!StartScreenWidget) return;
+	const auto World = GetWorld();
+	if (!StartScreenWidget || !IsValid(World)) return;
 
 	if (!IsValid(StartScreenInstance))
-		StartScreenInstance = CreateWidget<UUserWidget>(GetWorld(), StartScreenWidget);
+		StartScreenInstance = CreateWidget<UUserWidget>(World, StartScreenWidget);
 
 	if (IsValid(StartScreenInstance))
 		StartScreenInstance->AddToViewport(0);
@@ -214,4 +232,16 @@ void AMiniThievingGamePlayerController::HideStartScreen()
 		StartScreenInstance->RemoveFromParent();
 		StartScreenInstance->Destruct();
 	}
+}
+
+void AMiniThievingGamePlayerController::ShowGameOverScreen(const bool bHasWon)
+{
+	const auto World = GetWorld();
+	if (!GameOverWidget || !IsValid(World)) return;
+
+	if (!IsValid(GameOverInstance))
+		GameOverInstance = CreateWidget<UUserWidget>(World, GameOverWidget);
+
+	if (IsValid(GameOverInstance))
+		GameOverInstance->AddToViewport(0);
 }
