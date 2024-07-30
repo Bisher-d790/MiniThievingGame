@@ -5,8 +5,8 @@
 #include "Kismet/GameplayStatics.h"
 
 // Project
-#include "MiniThievingGame/Characters/MiniThievingGameCharacter.h"
 #include "MiniThievingGame/Core/MiniThievingGameGameMode.h"
+#include "MiniThievingGame/Objective/Artifact.h"
 
 AGoalTriggerVolume::AGoalTriggerVolume()
 {
@@ -30,19 +30,17 @@ void AGoalTriggerVolume::BeginPlay()
 
 void AGoalTriggerVolume::HandleBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	// TODO Make it so only the artifacts (objective actors) are counted
-	if (IsValid(OtherActor) && Cast<AMiniThievingGameCharacter>(OtherActor))
-	{
-		GoalReached(OtherActor, Cast<APawn>(OtherActor), 1);
-	}
+	if (IsValid(OtherActor))
+		if (const auto Artifact = Cast<AArtifact>(OtherActor))
+			GoalReached(Artifact, Artifact->GetPointsToGain());
 }
 
-void AGoalTriggerVolume::GoalReached(const AActor* ObjectiveActor, const APawn* ScoringPawn, const int Points)
+void AGoalTriggerVolume::GoalReached(const AArtifact* Artifact, const int Points)
 {
 	const auto World = GetWorld();
-	if (!IsValid(World) || !IsValid(ObjectiveActor) || !IsValid(ScoringPawn)) return;
+	if (!IsValid(World) || !IsValid(Artifact)) return;
 
 	if (const auto GM = UGameplayStatics::GetGameMode(World))
 		if (const auto MTGGameMode = Cast<AMiniThievingGameGameMode>(GM))
-			MTGGameMode->PawnScored(ObjectiveActor, ScoringPawn, Points);
+			MTGGameMode->PawnScored(Artifact, Points);
 }

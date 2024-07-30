@@ -6,6 +6,7 @@
 #include "GoalTriggerVolume.generated.h"
 
 class UBoxComponent;
+class AArtifact;
 
 UCLASS()
 class MINITHIEVINGGAME_API AGoalTriggerVolume : public AActor
@@ -29,6 +30,6 @@ protected:
 	void HandleBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	UFUNCTION()
-	void GoalReached(const AActor* ObjectiveActor, const APawn* ScoringPawn, const int Points);
+	void GoalReached(const AArtifact* Artifact, const int Points);
 #pragma endregion Overlap
 };

@@ -6,6 +6,7 @@
 
 // Project
 #include "MiniThievingGame/Player/MiniThievingGamePlayerController.h"
+#include "MiniThievingGame/Objective/Artifact.h"
 
 void AMiniThievingGameGameMode::StartPlay()
 {
@@ -63,12 +64,12 @@ void AMiniThievingGameGameMode::StartFinishedPhase()
 	}
 }
 
-void AMiniThievingGameGameMode::PawnScored(const AActor* ObjectiveActor, const APawn* ScoringPawn, const int Points)
+void AMiniThievingGameGameMode::PawnScored(const AArtifact* Artifact, const int Points)
 {
-	if (!IsValid(ObjectiveActor) || !IsValid(ScoringPawn)) return;
+	if (!IsValid(Artifact)) return;
 
 	// Validate score
-	if (CheckScoreCondition(ObjectiveActor))
+	if (CheckScoreCondition(Artifact))
 		AddScore(Points);
 
 	// Validate Game end condition

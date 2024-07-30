@@ -5,6 +5,8 @@
 
 #include "MiniThievingGameGameMode.generated.h"
 
+class AArtifact;
+
 UENUM()
 enum EGamePhase : uint8
 {
@@ -40,7 +42,7 @@ protected:
 #pragma region Scoring
 public:
 	UFUNCTION()
-	void PawnScored(const AActor* ObjectiveActor, const APawn* ScoringPawn, const int Points);
+	void PawnScored(const AArtifact* Artifact, const int Points);
 
 	UFUNCTION(BlueprintPure, Category = "Score")
 	FORCEINLINE int GetScore() const { return Score; }
