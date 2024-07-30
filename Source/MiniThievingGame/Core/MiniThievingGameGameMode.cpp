@@ -5,7 +5,7 @@
 #include "Kismet/GameplayStatics.h"
 
 // Project
-#include "MiniThievingGamePlayerController.h"
+#include "MiniThievingGame/Player/MiniThievingGamePlayerController.h"
 
 void AMiniThievingGameGameMode::StartPlay()
 {

@@ -5,8 +5,6 @@
 
 #include "MiniThievingGameGameMode.generated.h"
 
-class AMiniThievingGamePlayerController;
-
 UENUM()
 enum EGamePhase : uint8
 {

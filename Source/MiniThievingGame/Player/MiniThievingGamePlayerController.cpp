@@ -14,8 +14,8 @@
 #include "Kismet/GameplayStatics.h"
 
 // Project
-#include "MiniThievingGameCharacter.h"
-#include "MiniThievingGameGameMode.h"
+#include "MiniThievingGame/Characters/MiniThievingGameCharacter.h"
+#include "MiniThievingGame/Core/MiniThievingGameGameMode.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
