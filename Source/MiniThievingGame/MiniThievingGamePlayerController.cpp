@@ -245,3 +245,11 @@ void AMiniThievingGamePlayerController::ShowGameOverScreen(const bool bHasWon)
 	if (IsValid(GameOverInstance))
 		GameOverInstance->AddToViewport(0);
 }
+
+void AMiniThievingGamePlayerController::RestartGame()
+{
+	const auto World = GetWorld();
+	if (!IsValid(World)) return;
+
+	UGameplayStatics::OpenLevel(this, FName(*World->GetName()), false);
+}

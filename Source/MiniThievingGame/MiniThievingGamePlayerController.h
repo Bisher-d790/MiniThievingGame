@@ -106,6 +106,9 @@ public:
 
 	void ShowGameOverScreen(const bool bHasWon);
 
+	UFUNCTION(BlueprintCallable, Category = UI)
+	void RestartGame();
+
 private:
 	UPROPERTY(EditDefaultsOnly, Category = UI)
 	TSubclassOf<UUserWidget> StartScreenWidget = nullptr;
