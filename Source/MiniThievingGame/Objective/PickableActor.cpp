@@ -4,7 +4,7 @@
 #include "Components/SphereComponent.h"
 
 // Project
-#include "MiniThievingGame/Characters/MiniThievingGameCharacter.h"
+#include "MiniThievingGame/Interfaces/PickupInterface.h"
 
 // Sets default values
 APickableActor::APickableActor()
@@ -38,19 +38,16 @@ void APickableActor::BeginPlay()
 
 void APickableActor::HandleBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (!IsValid(OtherActor)) return;
-
-	if (const auto MTGCharacter = Cast<AMiniThievingGameCharacter>(OtherActor))
-	{
-		OnPickedUpByPlayer(MTGCharacter);
-	}
+	if (IsValid(OtherActor))
+		OnPickedUp(OtherActor);
 }
 
-void APickableActor::OnPickedUpByPlayer(AMiniThievingGameCharacter* Player)
+void APickableActor::OnPickedUp(AActor* PickerActor)
 {
-	if (!IsValid(Player)) return;
+	if (!IsValid(PickerActor)) return;
+	const auto PickerInterface = Cast<IPickupInterface>(PickerActor);
+	if (!PickerInterface) return;
 
-	Player->PickUpActor(this);
-
-	PlayerPickedUpBy = Player;
+	PickerInterface->PickUpActor(this);
+	ActorPickedUpBy = Cast<AActor>(PickerActor);
 }

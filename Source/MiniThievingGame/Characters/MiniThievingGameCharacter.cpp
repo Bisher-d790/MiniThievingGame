@@ -13,6 +13,7 @@
 
 // Project
 #include "MiniThievingGame/Objective/PickableActor.h"
+#include "MiniThievingGame/Components/PickupComponent.h"
 
 AMiniThievingGameCharacter::AMiniThievingGameCharacter()
 {
@@ -43,6 +44,8 @@ AMiniThievingGameCharacter::AMiniThievingGameCharacter()
 	TopDownCameraComponent->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	TopDownCameraComponent->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
+	PickupComponent = CreateDefaultSubobject<UPickupComponent>(TEXT("PickupComponent"));
+
 	// Activate ticking in order to update the cursor every frame.
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
@@ -59,11 +62,6 @@ void AMiniThievingGameCharacter::RotateCameraBoom(const float RotateValue)
 
 void AMiniThievingGameCharacter::PickUpActor(APickableActor* Actor)
 {
-	if (IsValid(PickedUpActor))
-		PickedUpActor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-
-	if (IsValid(Actor))
-		Actor->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale, PickUpSocket);
-
-	PickedUpActor = Actor;
+	if (IsValid(PickupComponent) && IsValid(Actor) && IsValid(GetMesh()))
+		PickupComponent->PickUp(Actor, GetMesh());
 }
