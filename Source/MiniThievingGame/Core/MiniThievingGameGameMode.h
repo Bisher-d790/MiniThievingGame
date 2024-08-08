@@ -21,7 +21,7 @@ class AMiniThievingGameGameMode : public AGameModeBase
 	GENERATED_BODY()
 
 public:
-	void StartPlay();
+	virtual void StartPlay() override;
 
 #pragma region GamePhases
 public:
